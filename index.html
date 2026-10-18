@@ -2214,17 +2214,85 @@ function playSynth(freq, type, duration, vol=0.1) {
         let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
         osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.start(); osc.stop(audioCtx.currentTime + duration);
     } catch(e) {}
 }
 
-function playJump()    { playSynth(200, 'sine', 0.2, 0.15); setTimeout(()=>playSynth(400, 'sine', 0.2, 0.1), 50); }
-function playCoin()    { playSynth(800, 'square', 0.1, 0.05); setTimeout(() => playSynth(1200, 'square', 0.2, 0.05), 50); }
-function playWin()     { playSynth(300, 'sawtooth', 0.2); setTimeout(()=>playSynth(400, 'sawtooth', 0.2), 150); setTimeout(()=>playSynth(600, 'sawtooth', 0.4), 300); }
-function playDie()     { playSynth(100, 'sawtooth', 0.8, 0.2); }
-function playPowerup() { playSynth(500, 'sine', 0.1); setTimeout(() => playSynth(1000, 'sine', 0.3), 100); }
+function playJump()    { playSynth(200, 'sine', 0.2, 0.12); setTimeout(()=>playSynth(400, 'sine', 0.2, 0.08), 50); }
+function playCoin()    { playSynth(800, 'square', 0.08, 0.04); setTimeout(() => playSynth(1200, 'square', 0.12, 0.04), 50); }
+function playWin()     {
+    if(!audioCtx || isMuted) return;
+    try {
+        const now = audioCtx.currentTime;
+        [ { f: 330, t: 0, d: 0.14 }, { f: 440, t: 0.12, d: 0.14 }, { f: 660, t: 0.24, d: 0.3 } ].forEach(n => {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(n.f, now + n.t);
+            gain.gain.setValueAtTime(0.12, now + n.t);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + n.t + n.d);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now + n.t); osc.stop(now + n.t + n.d);
+        });
+    } catch(e) {}
+}
+
+function playDie() {
+    if(!audioCtx || isMuted) return;
+    try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(190, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+        gain.gain.setValueAtTime(0.09, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.31);
+    } catch(e) {}
+}
+
+function playGameOver() {
+    if(!audioCtx || isMuted) return;
+    try {
+        const now = audioCtx.currentTime;
+        // Warm cybernetic defeat power-down: descending tones without harsh distortion
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(180, now);
+        osc1.frequency.exponentialRampToValueAtTime(90, now + 0.28);
+        gain1.gain.setValueAtTime(0.08, now);
+        gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.29);
+
+        setTimeout(() => {
+            if (!audioCtx || isMuted) return;
+            try {
+                const t2 = audioCtx.currentTime;
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(120, t2);
+                osc2.frequency.exponentialRampToValueAtTime(45, t2 + 0.45);
+                gain2.gain.setValueAtTime(0.07, t2);
+                gain2.gain.exponentialRampToValueAtTime(0.0001, t2 + 0.45);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(t2);
+                osc2.stop(t2 + 0.46);
+            } catch(e) {}
+        }, 160);
+    } catch(e) {}
+}
+
+function playPowerup() { playSynth(500, 'sine', 0.1, 0.08); setTimeout(() => playSynth(1000, 'sine', 0.25, 0.08), 100); }
 
 
 // =========================================================
@@ -3515,12 +3583,16 @@ function onFall() {
 function loseLife(reason, opts) {
     Lives.lastWasFall = !opts.mine;
     if (opts.mine) { opts.mine.userData.dead = true; shatterMine(opts.mine); }
-    playDie();
     setLives(Lives.count - 1);
     flashLives();
 
-    if (Lives.count <= 0) { outOfLives(reason); return; }
+    if (Lives.count <= 0) {
+        playGameOver();
+        outOfLives(reason);
+        return;
+    }
 
+    playDie();
     pauseGame('respawn');
     setTimeout(() => {
         respawnBall(Lives.lastWasFall ? 'safe' : 'here');
