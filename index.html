@@ -3333,6 +3333,8 @@ function transformBall(type) {
 // =========================================================
 
 const keys = { w: false, a: false, s: false, d: false, space: false };
+window.keys = keys;
+window.gameContext = { getPos: () => pos, getRings: () => rings, getRingsCollected: () => ringsCollected };
 
 window.addEventListener('keydown', (e) => {
     if(e.code === 'Escape' || e.code === 'KeyP') {
