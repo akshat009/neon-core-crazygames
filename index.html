@@ -2833,7 +2833,7 @@ scene.add(groundRing, groundGlow);
 
 // ---------- Particle pool (one draw call for every spark, shard and trail dot) ----------
 
-const PARTICLE_MAX = 900;
+const PARTICLE_MAX = 1500;
 const particles = {
     pos: new Float32Array(PARTICLE_MAX * 3),
     vel: new Float32Array(PARTICLE_MAX * 3),
@@ -2940,15 +2940,17 @@ function updateParticles(dt, timeScale) {
 // ---------- Effects fired by gameplay ----------
 
 function burstData(p) {
-    burst(p, 0x6ff8ff, 22, 0.2, 0.14, 0.55, { shape: 1 });
-    burst(p, 0xffffff, 6, 0.1, 0.22, 0.25, { shape: 1 });
+    burst(p, 0x00ffff, 85, 0.4, 0.3, 0.9, { shape: 1, lift: 0.06 });
+    burst(p, 0x6ff8ff, 45, 0.26, 0.22, 0.75, { shape: 1 });
+    burst(p, 0xffffff, 25, 0.48, 0.38, 0.45, { shape: 1 });
+    addShake(0.35);
 }
 
 function burstPowerup(p, type) {
     const c = POWERUP_COLORS[type];
-    burst(p, c, 36, 0.26, 0.16, 0.7, { shape: 1, gravity: 0.004 });
-    burst(p, c, 16, 0.16, 0.1, 0.6, { shape: 1, gravity: 0.006 });
-    burst(p, 0xffffff, 6, 0.12, 0.22, 0.25, { shape: 1 });
+    burst(p, c, 75, 0.36, 0.26, 0.95, { shape: 1, gravity: 0.004, lift: 0.08 });
+    burst(p, 0xffffff, 25, 0.42, 0.35, 0.4, { shape: 1 });
+    addShake(0.3);
 }
 
 // keepBall: a shield blocked the hit, so only the hurdle breaks
