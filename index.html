@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>Neon Core - CrazyGames Edition</title>
+    <!-- CrazyGames Official SDK v3 -->
+    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+    <!-- Three.js r128 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Cyberpunk Fonts: Orbitron & Rajdhani -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-display: 'Orbitron', -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+            --font-ui: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-red: #ff3344;
+            --neon-green: #00ff66;
+            --neon-amber: #ffaa00;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: var(--font-ui);
+            touch-action: none;
+            background-color: #0d0d1a;
+            color: #fff;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .glass-panel {
+            background: rgba(10, 10, 25, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        /* --- In-Game HUD --- */
+        #ui {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+            pointer-events: none;
+            padding: 12px 18px;
+            min-width: 190px;
+        }
+        #score-txt {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-bottom: 4px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+        #level-txt {
+            font-family: var(--font-display);
+            font-size: 13px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+            letter-spacing: 1px;
+        }
+        #diff-ui-txt {
+            display: inline-block;
+            margin-left: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #00ffff;
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+        #timer-txt {
+            font-family: var(--font-display);
+            font-size: 13px;
+            color: #ffffff;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+        }
+        #status-txt {
+            font-size: 13px;
+            font-weight: 700;
+            color: #dddddd;
+            margin-top: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* --- Top Right Controls (Pause & Mute) --- */
+        #top-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 30;
+            display: flex;
+            gap: 10px;
+        }
+        .small-btn {
+            background: rgba(10, 10, 25, 0.75);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 255, 255, 0.6);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-family: var(--font-display);
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.25);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .small-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+        .small-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* --- Fullscreen Menus & Modals --- */
+        .fullscreen-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(15, 15, 35, 0.94) 0%, rgba(5, 5, 12, 0.98) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .menu-box {
+            width: 90%;
+            max-width: 480px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.6);
+            box-shadow: inset 0 0 35px rgba(0, 255, 255, 0.12), 0 15px 50px rgba(0, 0, 0, 0.9);
+            background: rgba(10, 10, 26, 0.9);
+            border-radius: 14px;
+            backdrop-filter: blur(16px);
+        }
+        .menu-box h1 {
+            font-family: var(--font-display);
+            color: var(--neon-cyan);
+            margin: 0 0 6px 0;
+            font-size: 32px;
+            text-shadow: 0 0 24px rgba(0, 255, 255, 0.8);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .menu-box h2 {
+            font-family: var(--font-display);
+            margin: 0 0 15px 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        .menu-subtitle {
+            font-family: var(--font-display);
+            color: var(--neon-pink);
+            font-size: 13px;
+            letter-spacing: 4px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
+        }
+
+        .rules-list {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-left: 3px solid var(--neon-pink);
+            padding-left: 15px;
+            color: #e2e8f0;
+            background: rgba(0, 0, 0, 0.35);
+            padding-top: 12px;
+            padding-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.5;
+        }
+        .rules-list ul {
+            padding-left: 20px;
+            margin: 6px 0 0 0;
+        }
+        .rules-list li {
+            margin-bottom: 6px;
+        }
+
+        /* --- Difficulty Selector --- */
+        .diff-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+        .diff-btn {
+            flex: 1;
+            padding: 10px 4px;
+            font-size: 14px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: var(--font-display);
+            letter-spacing: 1px;
+        }
+        .diff-btn:hover {
+            border-color: rgba(0, 255, 255, 0.6);
+            color: #ffffff;
+        }
+        .diff-btn.active {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.22);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 18px rgba(0, 255, 255, 0.45);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #050510;
+            background: linear-gradient(90deg, #00ffff, #00cccc);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.45);
+            width: 100%;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(0, 255, 255, 0.7);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
+            box-shadow: 0 0 16px rgba(255, 0, 255, 0.25);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 0, 255, 0.15);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+            color: #fff;
+        }
+        .btn-rewarded {
+            background: linear-gradient(90deg, #ffaa00, #ff8800);
+            color: #050510;
+            box-shadow: 0 0 25px rgba(255, 170, 0, 0.45);
+            margin-bottom: 12px;
+        }
+        .btn-rewarded:hover {
+            box-shadow: 0 0 35px rgba(255, 170, 0, 0.75);
+        }
+
+        #stars-display {
+            font-size: 34px;
+            margin: 12px 0;
+            letter-spacing: 8px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 18px var(--neon-cyan);
+        }
+
+        /* --- Touch D-Pad & Jump Button --- */
+        #mobile-controls {
+            position: absolute;
+            bottom: 25px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            user-select: none;
+            z-index: 20;
+            padding: 0 25px;
+            box-sizing: border-box;
+            left: 0;
+        }
+        #dpad {
+            pointer-events: auto;
+            display: grid;
+            grid-template-columns: 58px 58px 58px;
+            gap: 8px;
+        }
+        .dpad-btn {
+            background: rgba(0, 255, 255, 0.15);
+            border: 2px solid rgba(0, 255, 255, 0.6);
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--neon-cyan);
+            height: 58px;
+            box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.2);
+            font-weight: 800;
+            border-radius: 8px;
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            text-shadow: 0 0 6px var(--neon-cyan);
+            font-family: var(--font-display);
+        }
+        .dpad-btn:active {
+            background: rgba(0, 255, 255, 0.5);
+            box-shadow: inset 0 0 25px rgba(0, 255, 255, 0.7);
+        }
+        #btn-up { grid-column: 2; grid-row: 1; }
+        #btn-left { grid-column: 1; grid-row: 2; }
+        #btn-down { grid-column: 2; grid-row: 2; }
+        #btn-right { grid-column: 3; grid-row: 2; }
+
+        #btn-jump {
+            pointer-events: auto;
+            align-self: flex-end;
+            width: 85px;
+            height: 85px;
+            background: rgba(255, 0, 255, 0.22);
+            border: 3px solid var(--neon-pink);
+            border-radius: 50%;
+            color: var(--neon-pink);
+            font-weight: 800;
+            font-size: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.4), inset 0 0 15px rgba(255, 0, 255, 0.3);
+            font-family: var(--font-display);
+            backdrop-filter: blur(6px);
+            text-shadow: 0 0 6px var(--neon-pink);
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        #btn-jump:active {
+            background: rgba(255, 0, 255, 0.6);
+            transform: scale(0.95);
+        }
+
+        /* --- CrazyGames Banner Slot Container --- */
+        #banner-container {
+            width: 300px;
+            height: 250px;
+            margin: 15px auto 0 auto;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px dashed rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* --- Responsive Portrait Adjustments --- */
+        @media (orientation: portrait) {
+            #ui { max-width: calc(100% - 150px); top: 15px; }
+            .menu-box { width: 92%; padding: 22px 18px; }
+            .menu-box h1 { font-size: 26px; }
+            .rules-list { font-size: 12px; }
+            .btn { font-size: 15px; padding: 12px 18px; }
+            #dpad { grid-template-columns: 48px 48px 48px; gap: 6px; }
+            .dpad-btn { height: 48px; font-size: 16px; }
+            #btn-jump { width: 72px; height: 72px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Controls: Pause & Mute -->
+<div id="top-controls">
+    <button id="pause-btn" class="small-btn" title="Pause Game (P or ESC)" style="display: none;">⏸ PAUSE</button>
+    <button id="mute-btn" class="small-btn">🔊 MUTE</button>
+</div>
+
+<!-- Start Menu -->
+<div id="start-menu" class="fullscreen-menu">
+    <div class="menu-box glass-panel">
+        <h1>NEON CORE</h1>
+        <p class="menu-subtitle">[ CYBER RUNNER ]</p>
+        
+        <div class="diff-container">
+            <button class="diff-btn" id="diff-easy" onclick="setDifficulty('EASY')">EASY</button>
+            <button class="diff-btn active" id="diff-medium" onclick="setDifficulty('MEDIUM')">MEDIUM</button>
+            <button class="diff-btn" id="diff-hard" onclick="setDifficulty('HARD')">HARD</button>
+        </div>
+
+        <div class="rules-list">
+            <b style="color:var(--neon-pink)">[ MISSION BRIEFING ]</b>
+            <ul>
+                <li><b style="color:#00ffff">CYAN DATA:</b> Collect all fragments to secure sector.</li>
+                <li><b style="color:#ff4444">RED LASER MINES:</b> Fatal collision! Dodge or jump.</li>
+                <li>🟩 <b style="color:#00ff66">GREEN POWERUP:</b> Micro Core (High Speed).</li>
+                <li>🟧 <b style="color:#ffaa00">ORANGE POWERUP:</b> Heavy Core (Super Jump).</li>
+            </ul>
+        </div>
+        <button id="start-btn" class="btn">START RUN</button>
+    </div>
+</div>
+
+<!-- System Paused Modal -->
+<div id="pause-modal" class="fullscreen-menu" style="display: none;">
+    <div class="menu-box glass-panel">
+        <h2 style="color: var(--neon-cyan); text-shadow: 0 0 16px var(--neon-cyan);">SYSTEM PAUSED</h2>
+        <p style="color: #cbd5e1; margin-bottom: 20px;">GAME LOOP HALTED</p>
+        <button id="resume-btn" class="btn">RESUME RUN</button>
+        <button id="pause-exit-btn" class="btn btn-secondary">QUIT TO MENU</button>
+        <div id="banner-container"></div>
+    </div>
+</div>
+
+<!-- Sector Secured (Level Complete) -->
+<div id="level-menu" class="fullscreen-menu" style="display:none;">
+    <div class="menu-box glass-panel">
+        <h1 id="lc-title">SECTOR SECURED</h1>
+        <div id="stars-display">⭐⭐⭐</div>
+        <div id="remark-txt" style="color: #00ffff; font-family: var(--font-display); font-size: 18px; margin-bottom: 18px; font-weight: 700; letter-spacing: 2px;">OPTIMAL PERFORMANCE</div>
+        
+        <div class="rules-list" style="text-align: center; border: none; padding: 0; background: transparent;">
+            <p>DIFFICULTY: <b id="lc-diff" style="color:#ff00ff;">MEDIUM</b></p>
+            <p>CYCLE TIME: <b id="lc-time">0.0s</b></p>
+            <p>DATA REWARD: <b id="lc-score" style="color:#00ffff;">+0</b></p>
+            <p>TOTAL ARCHIVE: <b id="lc-total" style="color:#ffaa00;">0</b></p>
+        </div>
+        
+        <button id="next-level-btn" class="btn">NEXT SECTOR</button>
+        <button id="exit-btn" class="btn btn-secondary">DISCONNECT</button>
+    </div>
+</div>
+
+<!-- System Failure (Game Over) -->
+<div id="gameover-menu" class="fullscreen-menu" style="display:none;">
+    <div class="menu-box glass-panel" style="border-color: #ff3333; box-shadow: inset 0 0 35px rgba(255,0,0,0.2), 0 0 45px rgba(255,0,0,0.5);">
+        <h1 style="color: #ff3344; text-shadow: 0 0 20px #ff0000;">SYSTEM FAILURE</h1>
+        <p id="death-reason" style="font-size: 15px; color: #fff; letter-spacing: 1px; margin-bottom: 15px;">Connection lost.</p>
+        <p style="font-size: 16px; margin-bottom: 20px;">ARCHIVED DATA: <b id="go-total" style="color:#ffaa00;">0</b></p>
+        
+        <button id="continue-ad-btn" class="btn btn-rewarded">⚡ REVIVE CORE (WATCH AD)</button>
+        <button id="restart-btn" class="btn" style="background: linear-gradient(90deg, #ff3344, #cc0000); color:#fff; box-shadow:0 0 20px rgba(255,0,0,0.5); border:none;">REBOOT RUN</button>
+    </div>
+</div>
+
+<!-- In-Game HUD -->
+<div id="ui" class="glass-panel" style="display:none;">
+    <div id="score-txt">DATA: 0 / 5</div>
+    <div id="level-txt">SECTOR: 1 <span id="diff-ui-txt">MEDIUM</span></div>
+    <div id="timer-txt">CYCLE: 0.0s</div>
+    <div id="status-txt">CHASSIS: STANDARD</div>
+</div>
+
+<!-- Mobile Controls -->
+<div id="mobile-controls" style="display:none;">
+    <div id="dpad">
+        <div class="dpad-btn" id="btn-up">W</div>
+        <div class="dpad-btn" id="btn-left">A</div>
+        <div class="dpad-btn" id="btn-down">S</div>
+        <div class="dpad-btn" id="btn-right">D</div>
+    </div>
+    <div id="btn-jump">JUMP</div>
+</div>
+
+<script>
+    // =========================================================
+    // CRAZYGAMES SDK v3 INTEGRATION
+    // =========================================================
+    let cgSdkReady = false;
+    let lastMidgameTime = 0;
+
+    async function initCrazyGames() {
+        try {
+            if (window.CrazyGames && window.CrazyGames.SDK) {
+                await window.CrazyGames.SDK.init();
+                cgSdkReady = true;
+                console.log("[CrazyGames] SDK v3 Ready. Environment:", window.CrazyGames.SDK.environment);
+            }
+        } catch(e) {
+            console.warn("[CrazyGames] Running outside portal or blocked by shields. Game will operate normally.", e);
+        }
+    }
+    window.addEventListener('load', initCrazyGames);
+
+    function safeCgGameplayStart() {
+        try {
+            if (cgSdkReady && window.CrazyGames?.SDK?.game) {
+                window.CrazyGames.SDK.game.gameplayStart();
+            }
+        } catch(e) {}
+    }
+
+    function safeCgGameplayStop() {
+        try {
+            if (cgSdkReady && window.CrazyGames?.SDK?.game) {
+                window.CrazyGames.SDK.game.gameplayStop();
+            }
+        } catch(e) {}
+    }
+
+    function safeCgHappytime() {
+        try {
+            if (cgSdkReady && window.CrazyGames?.SDK?.game) {
+                window.CrazyGames.SDK.game.happytime();
+            }
+        } catch(e) {}
+    }
+
+    function triggerMidgameAd(callback) {
+        const now = Date.now();
+        // 60-second cooldown between midgame ads to protect user experience
+        if (!cgSdkReady || !window.CrazyGames?.SDK?.ad || (now - lastMidgameTime < 60000)) {
+            callback();
+            return;
+        }
+
+        try {
+            if (audioCtx && !isMuted) audioCtx.suspend();
+            window.CrazyGames.SDK.ad.requestAd('midgame', {
+                adStarted: () => {
+                    if (audioCtx && !isMuted) audioCtx.suspend();
+                },
+                adFinished: () => {
+                    lastMidgameTime = Date.now();
+                    if (audioCtx && !isMuted) audioCtx.resume();
+                    callback();
+                },
+                adError: (error) => {
+                    console.warn('[CrazyGames] Midgame ad error:', error);
+                    if (audioCtx && !isMuted) audioCtx.resume();
+                    callback();
+                }
+            });
+        } catch(e) {
+            if (audioCtx && !isMuted) audioCtx.resume();
+            callback();
+        }
+    }
+
+    function triggerRewardedAd(onEarned, onFailed) {
+        if (!cgSdkReady || !window.CrazyGames?.SDK?.ad) {
+            // Outside portal: simulate reward so testing works
+            setTimeout(() => onEarned(), 500);
+            return;
+        }
+
+        try {
+            if (audioCtx && !isMuted) audioCtx.suspend();
+            let rewarded = false;
+            window.CrazyGames.SDK.ad.requestAd('rewarded', {
+                adStarted: () => {
+                    if (audioCtx && !isMuted) audioCtx.suspend();
+                },
+                adFinished: () => {
+                    rewarded = true;
+                    if (audioCtx && !isMuted) audioCtx.resume();
+                    onEarned();
+                },
+                adError: (error) => {
+                    console.warn('[CrazyGames] Rewarded ad error:', error);
+                    if (audioCtx && !isMuted) audioCtx.resume();
+                    if (!rewarded && onFailed) onFailed();
+                }
+            });
+        } catch(e) {
+            if (audioCtx && !isMuted) audioCtx.resume();
+            if (onFailed) onFailed();
+        }
+    }
+
+    function requestCrazyGamesBanner() {
+        try {
+            if (cgSdkReady && window.CrazyGames?.SDK?.banner) {
+                window.CrazyGames.SDK.banner.requestBanner({
+                    id: 'banner-container',
+                    width: 300,
+                    height: 250
+                });
+            }
+        } catch(e) {}
+    }
+
+    function clearCrazyGamesBanner() {
+        try {
+            if (cgSdkReady && window.CrazyGames?.SDK?.banner) {
+                window.CrazyGames.SDK.banner.clearBanner('banner-container');
+            }
+        } catch(e) {}
+    }
+
+    // =========================================================
+    // GAME AUDIO & SYNTHESIZER
+    // =========================================================
+    let audioCtx = null;
+    let isMuted = false;
+
+    function initAudio() {
+        if (!audioCtx) {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (isMuted) audioCtx.suspend();
+            } catch(e) {}
+        }
+    }
+
+    document.getElementById('mute-btn').addEventListener('click', (e) => {
+        isMuted = !isMuted;
+        e.target.innerText = isMuted ? "🔇 UNMUTE" : "🔊 MUTE";
+        if (audioCtx) {
+            if (isMuted) audioCtx.suspend();
+            else audioCtx.resume();
+        }
+    });
+
+    function playSynth(freq, type, duration, vol=0.1) {
+        if (!audioCtx || isMuted) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function playJump() { playSynth(200, 'sine', 0.2, 0.15); setTimeout(() => playSynth(400, 'sine', 0.2, 0.1), 50); }
+    function playCoin() { playSynth(800, 'square', 0.1, 0.05); setTimeout(() => playSynth(1200, 'square', 0.2, 0.05), 50); }
+    function playWin() { playSynth(300, 'sawtooth', 0.2); setTimeout(() => playSynth(400, 'sawtooth', 0.2), 150); setTimeout(() => playSynth(600, 'sawtooth', 0.4), 300); }
+    function playDie() { playSynth(100, 'sawtooth', 0.8, 0.2); }
+    function playPowerup() { playSynth(500, 'sine', 0.1); setTimeout(() => playSynth(1000, 'sine', 0.3), 100); }
+
+    function enterFullscreen() {
+        try {
+            let docElm = document.documentElement;
+            if (docElm.requestFullscreen) docElm.requestFullscreen().catch(() => {});
+            else if (docElm.webkitRequestFullscreen) docElm.webkitRequestFullscreen();
+        } catch(e) {}
+    }
+
+    // =========================================================
+    // DIFFICULTY & PROGRESS
+    // =========================================================
+    let totalScore = 0;
+    try { totalScore = parseInt(localStorage.getItem('neonCoreScore')) || 0; } catch(e) {}
+    function saveScore(score) { try { localStorage.setItem('neonCoreScore', score); } catch(e) {} }
+
+    let selectedDifficulty = 'MEDIUM';
+    const diffConfig = {
+        'EASY':   { speed: 0.20, jump: 0.45, gapBase: 0, gapScale: 0.5, spikeChance: 0.2, movPlatChance: 0.2, timePar: 3.5, lengthBase: 18 },
+        'MEDIUM': { speed: 0.28, jump: 0.45, gapBase: 3, gapScale: 1.0, spikeChance: 0.5, movPlatChance: 0.4, timePar: 2.5, lengthBase: 15 },
+        'HARD':   { speed: 0.35, jump: 0.45, gapBase: 6, gapScale: 1.5, spikeChance: 0.8, movPlatChance: 0.7, timePar: 1.8, lengthBase: 12 }
+    };
+
+    function setDifficulty(diff) {
+        selectedDifficulty = diff;
+        document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`diff-${diff.toLowerCase()}`).classList.add('active');
+        level = 1;
+    }
+
+    // =========================================================
+    // THREE.JS SCENE SETUP
+    // =========================================================
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a1a);
+    scene.fog = new THREE.FogExp2(0x0a0a1a, 0.018);
+
+    let initialAspect = window.innerWidth / window.innerHeight;
+    let initialFov = initialAspect < 1 ? 75 : 55;
+    const camera = new THREE.PerspectiveCamera(initialFov, initialAspect, 0.1, 250);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambientLight);
+
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444466, 0.5);
+    scene.add(hemiLight);
+
+    const dirLight = new THREE.DirectionalLight(0x00ffff, 1.2);
+    dirLight.position.set(15, 25, 10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    dirLight.shadow.bias = -0.001;
+    scene.add(dirLight);
+
+    const pinkLight = new THREE.DirectionalLight(0xff00ff, 0.6);
+    pinkLight.position.set(-15, 15, -15);
+    scene.add(pinkLight);
+
+    // Materials & Geometries
+    const floorMat = new THREE.MeshPhysicalMaterial({ color: 0x15152a, roughness: 0.1, metalness: 0.8, clearcoat: 0.5 });
+    const edgeMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2, transparent: true, opacity: 0.8 });
+    const ringGeo = new THREE.OctahedronGeometry(0.8);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00aaff, emissiveIntensity: 0.8, wireframe: true });
+    const spikeGeo = new THREE.DodecahedronGeometry(0.9);
+    const spikeMat = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0xcc0000, emissiveIntensity: 0.8, wireframe: true });
+    const bigMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, emissive: 0xaa5500, wireframe: true });
+    const smallMat = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00aa00, wireframe: true });
+
+    let ballRadius = 1;
+    let ballState = 'normal';
+    const coreMat = new THREE.MeshPhysicalMaterial({ color: 0x00ffff, emissive: 0x0055aa, roughness: 0.05, transmission: 0.9, thickness: 1.0, clearcoat: 1.0 });
+    const steelMat = new THREE.MeshPhysicalMaterial({ color: 0xffaa00, emissive: 0x663300, roughness: 0.3, metalness: 1.0, clearcoat: 0.8 });
+
+    const ballGeo = new THREE.SphereGeometry(1, 64, 64);
+    const ball = new THREE.Mesh(ballGeo, coreMat);
+    const coreLight = new THREE.PointLight(0x00ffff, 2.0, 15);
+    ball.add(coreLight);
+    ball.castShadow = true;
+    scene.add(ball);
+
+    let platforms = [], edges = [], rings = [], spikes = [], movPlatforms = [], powerups = [];
+    let level = 1, ringsCollected = 0, targetRings = 5;
+    let isGameOver = false, isPlaying = false, isPaused = false;
+    let pos = new THREE.Vector3(0, 5, -2), vel = new THREE.Vector3(0, 0, 0);
+    let onGround = true, isOnMovingPlat = false, currentPlatVel = new THREE.Vector3(0,0,0);
+    let gravity = 0.02, jumpStrength = 0.45, maxSpeed = 0.3;
+
+    let levelStartTime = 0;
+    let pausedTimeAccum = 0;
+    let pauseStartStamp = 0;
+    let currentTimeStr = "0.0";
+    const clock = new THREE.Clock();
+
+    function generateLevel() {
+        [platforms, edges, rings, spikes, movPlatforms, powerups].forEach(arr => arr.forEach(obj => scene.remove(obj)));
+        platforms = []; edges = []; rings = []; spikes = []; movPlatforms = []; powerups = [];
+
+        let cfg = diffConfig[selectedDifficulty];
+        maxSpeed = cfg.speed + (level * 0.015);
+        targetRings = (selectedDifficulty === 'EASY' ? 2 : 3) + level * 2;
+        ringsCollected = 0;
+
+        document.getElementById('diff-ui-txt').innerText = selectedDifficulty;
+
+        pos.set(0, 5, -2);
+        vel.set(0, 0, 0);
+        ball.position.copy(pos);
+        transformBall('normal');
+
+        let currentZ = 0;
+        for (let i = 0; i < targetRings + 2; i++) {
+            let length = Math.max(cfg.lengthBase - (level * 0.5), 8);
+            let gap = (i === 0) ? 0 : cfg.gapBase + Math.min(level * cfg.gapScale, 15);
+            currentZ -= gap;
+
+            if (gap > 6 && Math.random() < cfg.movPlatChance + (level * 0.02)) {
+                let mPlat = new THREE.Mesh(new THREE.BoxGeometry(6, 0.5, 4), floorMat);
+                mPlat.position.set(0, 0, currentZ + gap/2);
+                let mEdge = new THREE.LineSegments(new THREE.EdgesGeometry(mPlat.geometry), new THREE.LineBasicMaterial({color: 0xff00ff, opacity: 0.8, transparent: true}));
+                mPlat.add(mEdge);
+                mPlat.userData = { startX: -4, endX: 4, speed: 0.05 + (maxSpeed * 0.1), dir: 1 };
+                scene.add(mPlat);
+                movPlatforms.push(mPlat);
+            }
+
+            let plat = new THREE.Mesh(new THREE.BoxGeometry(14, 1, length), floorMat);
+            plat.position.set(0, 0, currentZ - length/2);
+            plat.receiveShadow = true;
+            scene.add(plat);
+            platforms.push(plat);
+
+            let dynEdgeGeo = new THREE.EdgesGeometry(plat.geometry);
+            let pEdge = new THREE.LineSegments(dynEdgeGeo, edgeMat);
+            pEdge.position.copy(plat.position);
+            scene.add(pEdge);
+            edges.push(pEdge);
+
+            if (i > 0 && i <= targetRings) {
+                let r = new THREE.Mesh(ringGeo, ringMat);
+                r.position.set(Math.random() * 8 - 4, 1.5, currentZ - length/2);
+                scene.add(r);
+                rings.push(r);
+
+                if (Math.random() < cfg.spikeChance + (level * 0.05)) {
+                    let numSpikes = Math.floor(Math.random() * (level + (selectedDifficulty === 'HARD' ? 2 : 0)));
+                    numSpikes = Math.min(numSpikes, 6);
+                    for (let s = 0; s < numSpikes; s++) {
+                        let sp = new THREE.Mesh(spikeGeo, spikeMat);
+                        sp.position.set(Math.random() * 10 - 5, 1.2, currentZ - Math.random() * length);
+                        if (selectedDifficulty === 'HARD' || level > 5) {
+                            if (Math.random() > 0.5) {
+                                sp.userData = { moving: true, speed: 0.02 + (level * 0.005), dir: 1, startX: sp.position.x - 2, endX: sp.position.x + 2 };
+                            }
+                        }
+                        scene.add(sp);
+                        spikes.push(sp);
+                    }
+                }
+
+                if (Math.random() > 0.6) {
+                    let type = Math.random() > 0.5 ? 'big' : 'small';
+                    let p = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), type === 'big' ? bigMat : smallMat);
+                    p.position.set(Math.random() * 6 - 3, 1.5, currentZ - length/2 + 2);
+                    p.userData = { type: type };
+                    scene.add(p);
+                    powerups.push(p);
+                }
+            }
+            currentZ -= length;
+        }
+
+        updateUI();
+        levelStartTime = Date.now();
+        pausedTimeAccum = 0;
+        isGameOver = false;
+        isPaused = false;
+        isPlaying = true;
+        keys.w = keys.a = keys.s = keys.d = keys.space = false;
+        clock.start();
+
+        safeCgGameplayStart();
+        document.getElementById('pause-btn').style.display = 'flex';
+    }
+
+    function transformBall(type) {
+        ballState = type;
+        if (type === 'big') {
+            ballRadius = 1.4;
+            jumpStrength = 0.55;
+            ball.scale.set(1.4, 1.4, 1.4);
+            ball.material = steelMat;
+            coreLight.color.setHex(0xffaa00);
+            document.getElementById('status-txt').innerText = "CHASSIS: HEAVY (HIGH JUMP)";
+            document.getElementById('status-txt').style.color = "#ffaa00";
+            playPowerup();
+        } else if (type === 'small') {
+            ballRadius = 0.6;
+            jumpStrength = 0.4;
+            ball.scale.set(0.6, 0.6, 0.6);
+            ball.material = coreMat;
+            coreLight.color.setHex(0x00ff00);
+            document.getElementById('status-txt').innerText = "CHASSIS: MICRO (FAST SPEED)";
+            document.getElementById('status-txt').style.color = "#00ff00";
+            playPowerup();
+        } else {
+            ballRadius = 1;
+            jumpStrength = 0.48;
+            ball.scale.set(1, 1, 1);
+            ball.material = coreMat;
+            coreLight.color.setHex(0x00ffff);
+            document.getElementById('status-txt').innerText = "CHASSIS: STANDARD";
+            document.getElementById('status-txt').style.color = "#00ffff";
+        }
+    }
+
+    // =========================================================
+    // CONTROLS & INPUT
+    // =========================================================
+    const keys = { w: false, a: false, s: false, d: false, space: false };
+
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyP' || e.code === 'Escape') {
+            togglePause();
+            return;
+        }
+        if (['ArrowUp','KeyW'].includes(e.code)) keys.w = true;
+        if (['ArrowDown','KeyS'].includes(e.code)) keys.s = true;
+        if (['ArrowLeft','KeyA'].includes(e.code)) keys.a = true;
+        if (['ArrowRight','KeyD'].includes(e.code)) keys.d = true;
+        if (e.code === 'Space') { keys.space = true; e.preventDefault(); }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if (['ArrowUp','KeyW'].includes(e.code)) keys.w = false;
+        if (['ArrowDown','KeyS'].includes(e.code)) keys.s = false;
+        if (['ArrowLeft','KeyA'].includes(e.code)) keys.a = false;
+        if (['ArrowRight','KeyD'].includes(e.code)) keys.d = false;
+        if (e.code === 'Space') keys.space = false;
+    });
+
+    const setupBtnTouch = (id, k) => {
+        const el = document.getElementById(id);
+        el.addEventListener('touchstart', (e) => { e.stopPropagation(); e.preventDefault(); keys[k] = true; }, {passive: false});
+        el.addEventListener('touchend', (e) => { e.stopPropagation(); e.preventDefault(); keys[k] = false; }, {passive: false});
+    };
+    setupBtnTouch('btn-up','w');
+    setupBtnTouch('btn-down','s');
+    setupBtnTouch('btn-left','a');
+    setupBtnTouch('btn-right','d');
+    setupBtnTouch('btn-jump','space');
+
+    function updateUI() {
+        document.getElementById('score-txt').innerText = `DATA: ${ringsCollected} / ${targetRings}`;
+        document.getElementById('level-txt').innerHTML = `SECTOR: ${level} <span id="diff-ui-txt">${selectedDifficulty}</span>`;
+    }
+
+    function attachButtonAction(id, action) {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.addEventListener('click', action);
+        btn.addEventListener('touchstart', (e) => { e.stopPropagation(); e.preventDefault(); action(); }, {passive: false});
+    }
+
+    // =========================================================
+    // PAUSE SYSTEM
+    // =========================================================
+    function togglePause() {
+        if (!isPlaying || isGameOver) return;
+        if (isPaused) {
+            resumeGame();
+        } else {
+            pauseGame();
+        }
+    }
+
+    function pauseGame() {
+        if (!isPlaying || isGameOver || isPaused) return;
+        isPaused = true;
+        pauseStartStamp = Date.now();
+        safeCgGameplayStop();
+        document.getElementById('pause-modal').style.display = 'flex';
+        requestCrazyGamesBanner();
+    }
+
+    function resumeGame() {
+        if (!isPaused) return;
+        isPaused = false;
+        pausedTimeAccum += (Date.now() - pauseStartStamp);
+        document.getElementById('pause-modal').style.display = 'none';
+        clearCrazyGamesBanner();
+        safeCgGameplayStart();
+        clock.start();
+    }
+
+    attachButtonAction('pause-btn', togglePause);
+    attachButtonAction('resume-btn', resumeGame);
+    attachButtonAction('pause-exit-btn', () => {
+        document.getElementById('pause-modal').style.display = 'none';
+        clearCrazyGamesBanner();
+        safeCgGameplayStop();
+        isPaused = false;
+        isPlaying = false;
+        document.getElementById('ui').style.display = 'none';
+        document.getElementById('mobile-controls').style.display = 'none';
+        document.getElementById('pause-btn').style.display = 'none';
+        document.getElementById('start-menu').style.display = 'flex';
+        level = 1;
+    });
+
+    // =========================================================
+    // MENU ACTIONS
+    // =========================================================
+    attachButtonAction('start-btn', () => {
+        enterFullscreen();
+        initAudio();
+        document.getElementById('start-menu').style.display = 'none';
+        document.getElementById('ui').style.display = 'block';
+        if ('ontouchstart' in window) {
+            document.getElementById('mobile-controls').style.display = 'flex';
+        }
+        triggerMidgameAd(() => {
+            generateLevel();
+        });
+    });
+
+    attachButtonAction('next-level-btn', () => {
+        enterFullscreen();
+        document.getElementById('level-menu').style.display = 'none';
+        level++;
+        triggerMidgameAd(() => {
+            generateLevel();
+        });
+    });
+
+    attachButtonAction('exit-btn', () => {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        document.getElementById('level-menu').style.display = 'none';
+        document.getElementById('ui').style.display = 'none';
+        document.getElementById('mobile-controls').style.display = 'none';
+        document.getElementById('pause-btn').style.display = 'none';
+        document.getElementById('start-menu').style.display = 'flex';
+        isPlaying = false;
+        level = 1;
+        keys.w = keys.a = keys.s = keys.d = keys.space = false;
+        safeCgGameplayStop();
+    });
+
+    attachButtonAction('restart-btn', () => {
+        enterFullscreen();
+        document.getElementById('gameover-menu').style.display = 'none';
+        clearCrazyGamesBanner();
+        triggerMidgameAd(() => {
+            generateLevel();
+        });
+    });
+
+    attachButtonAction('continue-ad-btn', () => {
+        triggerRewardedAd(() => {
+            // Player successfully watched ad -> Revive!
+            document.getElementById('gameover-menu').style.display = 'none';
+            clearCrazyGamesBanner();
+            isGameOver = false;
+            isPlaying = true;
+            isPaused = false;
+            pos.set(0, 4, pos.z);
+            vel.set(0, 0, 0);
+            ball.position.copy(pos);
+            keys.w = keys.a = keys.s = keys.d = keys.space = false;
+            safeCgGameplayStart();
+        }, () => {
+            // Failed or closed ad
+            alert('Ad was closed early. Tap REBOOT to start from Sector 1.');
+        });
+    });
+
+    // =========================================================
+    // LEVEL COMPLETE & DIE
+    // =========================================================
+    function showLevelComplete() {
+        isPlaying = false;
+        playWin();
+        safeCgGameplayStop();
+        safeCgHappytime();
+        document.getElementById('pause-btn').style.display = 'none';
+        keys.w = keys.a = keys.s = keys.d = keys.space = false;
+
+        let timeTaken = parseFloat(currentTimeStr);
+        let cfg = diffConfig[selectedDifficulty];
+
+        let stars = 1, remark = "ACCEPTABLE", color = "#ffaa00";
+        let parTime3Stars = targetRings * cfg.timePar;
+        let parTime2Stars = targetRings * (cfg.timePar + 1.5);
+
+        if (timeTaken <= parTime3Stars) { stars = 3; remark = "OPTIMAL"; color = "#00ffff"; }
+        else if (timeTaken <= parTime2Stars) { stars = 2; remark = "EFFICIENT"; color = "#00aaff"; }
+
+        let starHtml = "";
+        for (let i = 0; i < 3; i++) starHtml += (i < stars) ? "⭐ " : "🌑 ";
+
+        let difficultyMultiplier = selectedDifficulty === 'HARD' ? 3 : (selectedDifficulty === 'MEDIUM' ? 2 : 1);
+        let levelScore = ((stars * 100) + (targetRings * 10)) * difficultyMultiplier;
+
+        totalScore += levelScore;
+        saveScore(totalScore);
+
+        document.getElementById('lc-title').innerText = `SECTOR ${level} SECURED`;
+        document.getElementById('stars-display').innerHTML = starHtml;
+        document.getElementById('remark-txt').innerText = remark;
+        document.getElementById('remark-txt').style.color = color;
+
+        document.getElementById('lc-diff').innerText = selectedDifficulty;
+        document.getElementById('lc-time').innerText = `${timeTaken}s`;
+        document.getElementById('lc-score').innerText = `+${levelScore}`;
+        document.getElementById('lc-total').innerText = totalScore;
+
+        document.getElementById('level-menu').style.display = 'flex';
+    }
+
+    function die(reason) {
+        if (isGameOver) return;
+        isGameOver = true;
+        isPlaying = false;
+        playDie();
+        safeCgGameplayStop();
+        document.getElementById('pause-btn').style.display = 'none';
+        keys.w = keys.a = keys.s = keys.d = keys.space = false;
+        document.getElementById('death-reason').innerText = reason;
+        document.getElementById('go-total').innerText = totalScore;
+        document.getElementById('gameover-menu').style.display = 'flex';
+    }
+
+    // =========================================================
+    // MAIN GAME LOOP
+    // =========================================================
+    function animate() {
+        requestAnimationFrame(animate);
+
+        let dt = clock.getDelta();
+        if (dt > 0.1) dt = 0.1;
+        let timeScale = dt * 60;
+
+        if (isPlaying && !isGameOver && !isPaused) {
+            let timeElapsed = (Date.now() - levelStartTime - pausedTimeAccum) / 1000;
+            currentTimeStr = Math.max(timeElapsed, 0).toFixed(1);
+            document.getElementById('timer-txt').innerText = `CYCLE: ${currentTimeStr}s`;
+
+            let currentMaxSpeed = maxSpeed;
+            if (ballState === 'small') currentMaxSpeed *= 1.4;
+            if (ballState === 'big') currentMaxSpeed *= 0.85;
+
+            let targetVx = 0, targetVz = 0;
+            if (keys.w) targetVz = -currentMaxSpeed;
+            if (keys.s) targetVz = currentMaxSpeed;
+            if (keys.a) targetVx = -currentMaxSpeed;
+            if (keys.d) targetVx = currentMaxSpeed;
+
+            vel.x += (targetVx - vel.x) * 0.15 * timeScale;
+            vel.z += (targetVz - vel.z) * 0.15 * timeScale;
+
+            if (isOnMovingPlat) {
+                pos.x += currentPlatVel.x * timeScale;
+                pos.z += currentPlatVel.z * timeScale;
+            }
+
+            if (keys.space && onGround) {
+                vel.y = jumpStrength;
+                onGround = false;
+                isOnMovingPlat = false;
+                playJump();
+            }
+
+            vel.y -= gravity * timeScale;
+
+            pos.x += vel.x * timeScale;
+            pos.y += vel.y * timeScale;
+            pos.z += vel.z * timeScale;
+
+            onGround = false;
+            isOnMovingPlat = false;
+
+            for (let p of platforms) {
+                if (p.geometry.parameters.height === 1) {
+                    let d = p.geometry.parameters.depth, w = p.geometry.parameters.width;
+                    if (pos.x > p.position.x - w/2 && pos.x < p.position.x + w/2 && pos.z < p.position.z + d/2 && pos.z > p.position.z - d/2) {
+                        if (pos.y - ballRadius <= 0.5 && pos.y > 0.2 && vel.y <= 0) {
+                            pos.y = 0.5 + ballRadius;
+                            vel.y = 0;
+                            onGround = true;
+                        }
+                    }
+                }
+            }
+
+            for (let m of movPlatforms) {
+                m.position.x += m.userData.speed * m.userData.dir * timeScale;
+                if (m.position.x > m.userData.endX || m.position.x < m.userData.startX) m.userData.dir *= -1;
+
+                if (Math.abs(pos.x - m.position.x) < 3.5 && Math.abs(pos.z - m.position.z) < 2.5) {
+                    if (pos.y - ballRadius <= m.position.y + 0.25 && pos.y > m.position.y && vel.y <= 0) {
+                        pos.y = m.position.y + 0.25 + ballRadius;
+                        vel.y = 0;
+                        onGround = true;
+                        isOnMovingPlat = true;
+                        currentPlatVel.x = m.userData.speed * m.userData.dir;
+                    }
+                }
+            }
+
+            if (pos.y < -3) die("GRID BREACH DETECTED!");
+            if (pos.x > 6) { pos.x = 6; vel.x = 0; }
+            if (pos.x < -6) { pos.x = -6; vel.x = 0; }
+
+            ball.position.copy(pos);
+            if (onGround) {
+                ball.rotation.x += (vel.z / ballRadius) * timeScale;
+                ball.rotation.z -= (vel.x / ballRadius) * timeScale;
+            } else {
+                ball.rotation.x += (vel.z / ballRadius) * 0.5 * timeScale;
+                ball.rotation.z -= (vel.x / ballRadius) * 0.5 * timeScale;
+            }
+
+            for (let i = rings.length - 1; i >= 0; i--) {
+                rings[i].rotation.x += 0.02 * timeScale;
+                rings[i].rotation.y += 0.05 * timeScale;
+                if (pos.distanceTo(rings[i].position) < ballRadius + 1.2) {
+                    scene.remove(rings[i]);
+                    rings.splice(i, 1);
+                    ringsCollected++;
+                    updateUI();
+                    playCoin();
+                    if (ringsCollected >= targetRings) showLevelComplete();
+                }
+            }
+
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                powerups[i].rotation.x += 0.02 * timeScale;
+                powerups[i].rotation.y += 0.05 * timeScale;
+                if (pos.distanceTo(powerups[i].position) < ballRadius + 1) {
+                    transformBall(powerups[i].userData.type);
+                    scene.remove(powerups[i]);
+                    powerups.splice(i, 1);
+                }
+            }
+
+            for (let sp of spikes) {
+                if (sp.userData.moving) {
+                    sp.position.x += sp.userData.speed * sp.userData.dir * timeScale;
+                    if (sp.position.x > sp.userData.endX || sp.position.x < sp.userData.startX) sp.userData.dir *= -1;
+                }
+                sp.rotation.y += 0.02 * timeScale;
+                sp.rotation.x += 0.02 * timeScale;
+                if (pos.distanceTo(sp.position) < ballRadius + 0.8) die("LASER MINE COLLISION!");
+            }
+        }
+
+        camera.position.lerp(new THREE.Vector3(ball.position.x, ball.position.y + 7, ball.position.z + 10), 0.1 * (dt * 60 || 1));
+        camera.lookAt(ball.position.x, ball.position.y, ball.position.z - 5);
+
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    clock.start();
+    animate();
+</script>
+</body>
+</html>
