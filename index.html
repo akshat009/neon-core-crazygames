@@ -174,29 +174,33 @@ body {
 .lives-wrap {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 9px;
+    margin-top: 9px;
 }
 .lives-label {
-    font: 700 10px var(--font-ui);
+    font: 700 11px var(--font-hud);
     letter-spacing: 2px;
-    color: rgba(190, 240, 255, 0.75);
+    color: var(--neon-text);
+    text-shadow: 0 0 8px rgba(41, 243, 255, 0.7);
 }
 #lives-row {
     display: flex;
-    gap: 7px;
+    align-items: center;
+    gap: 8px;
 }
 #lives-row .life {
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
     transform: rotate(45deg);
     border: 1.5px solid rgba(41, 243, 255, 0.45);
     background: transparent;
+    box-sizing: border-box;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 #lives-row .life.on {
     background: var(--neon);
     border-color: var(--neon);
-    box-shadow: 0 0 8px var(--neon);
+    box-shadow: 0 0 8px var(--neon), 0 0 16px rgba(41, 243, 255, 0.6);
 }
 #lives-row.hit {
     animation: lives-hit 0.5s ease-out;
@@ -1200,7 +1204,14 @@ body.touch #shield-btn {
         <div id="score-txt">DATA: 00/05</div>
         <div class="data-bar"><div id="data-fill"></div></div>
         <div id="status-txt">CHASSIS: STANDARD</div>
-        <div class="lives-wrap"><span class="lives-label">LIVES</span><div id="lives-row"></div></div>
+        <div class="lives-wrap">
+            <span class="lives-label">LIVES</span>
+            <div id="lives-row" aria-label="3 lives">
+                <span class="life on"></span>
+                <span class="life on"></span>
+                <span class="life on"></span>
+            </div>
+        </div>
     </div>
 
     <button id="shield-btn" aria-label="Shield">
