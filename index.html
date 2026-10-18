@@ -861,7 +861,7 @@ body.touch .touch-only { display: flex; }
 
 
 /* =========================================================
-   Neon Core features — shield, lives, ads, run flow
+   Neon Core features — shield, lives, run flow
    ========================================================= */
 
 :root {
@@ -921,365 +921,11 @@ body.touch .touch-only { display: flex; }
 }
 .reward-btn:active { transform: scale(0.95); }
 
-/* Rewarded-ad buttons in menus and popups */
-.btn-reward,
-.btn-reward:active {
-    color: #1a1000;
-    background: linear-gradient(90deg, var(--reward-a), var(--reward-b));
-    box-shadow: 0 0 20px rgba(255, 190, 60, 0.45);
-}
-.play { display: inline-block; margin-right: 4px; font-size: 0.85em; }
-
-/* ---------- Out of lives / restart screens ---------- */
-
 .go-stats { font-family: var(--font-hud); font-size: 14px; letter-spacing: 1.5px; color: rgba(255, 220, 220, 0.85); margin: 6px 0 16px; }
 .go-stats b { color: #fff; }
 .go-total { font-family: var(--font-hud); font-size: 15px; letter-spacing: 1.5px; color: #ddd; margin: 8px 0 0; }
 
 .restart-note { font-family: var(--font-ui); font-size: 16px; font-weight: 600; line-height: 1.5; color: #e6f7ff; margin: 6px 0 14px; }
-
-#restart-menu,
-#pause-modal {
-    box-sizing: border-box;
-    padding-bottom: 76px;   /* keep the buttons well above the banner */
-}
-
-/* CrazyGames sponsored banner slot (adaptive 728x90 desktop / 320x50 mobile) */
-.ad-banner {
-    display: none;
-    position: fixed;
-    left: 50%;
-    bottom: calc(14px + var(--safe-b, 0px));
-    transform: translateX(-50%);
-    width: 728px;
-    max-width: calc(100vw - 32px);
-    height: 90px;
-    box-sizing: border-box;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: rgba(8, 14, 26, 0.94);
-    border: 1px solid rgba(41, 243, 255, 0.4);
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.85), 0 0 12px rgba(41, 243, 255, 0.25);
-    border-radius: 6px;
-    overflow: hidden;
-    backdrop-filter: blur(12px);
-    z-index: 60;
-}
-.ad-banner.show { display: flex; }
-.ad-banner.live { background: none; border: none; box-shadow: none; }
-
-.cg-banner-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    height: 100%;
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: rgba(41, 243, 255, 0.9);
-    text-shadow: 0 0 8px rgba(41, 243, 255, 0.5);
-    background: radial-gradient(circle at center, rgba(104, 66, 255, 0.2), transparent 75%);
-}
-.cg-banner-badge {
-    background: #6842ff;
-    color: #ffffff;
-    font-weight: 800;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 10px;
-    letter-spacing: 1.2px;
-    box-shadow: 0 0 12px rgba(104, 66, 255, 0.8);
-}
-.cg-banner-txt {
-    font-size: 11px;
-    font-weight: 700;
-}
-
-@media (max-width: 768px) {
-    .ad-banner {
-        width: 320px;
-        height: 50px;
-        gap: 8px;
-    }
-    .cg-banner-placeholder {
-        font-size: 9px;
-        gap: 6px;
-    }
-    .cg-banner-badge {
-        font-size: 8px;
-        padding: 2px 6px;
-    }
-    .cg-banner-txt {
-        font-size: 9px;
-    }
-}
-
-/* "Loading ad…" / "Ad not available" */
-.ad-toast {
-    position: fixed;
-    left: 50%;
-    top: calc(18px + var(--safe-t));
-    z-index: 110;
-    transform: translate(-50%, -12px);
-    padding: 9px 16px;
-    max-width: 86vw;
-    font: 700 12px var(--font-hud);
-    letter-spacing: 1px;
-    color: #1a1000;
-    background: linear-gradient(90deg, var(--reward-a), var(--reward-b));
-    border-radius: 6px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-}
-.ad-toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-.ad-tag {
-    display: inline-block;
-    padding: 2px 5px;
-    font: 700 10px var(--font-hud);
-    letter-spacing: 1px;
-    color: #1a1000;
-    background: var(--reward-a);
-    border-radius: 3px;
-}
-
-/* ---------- HUD: lives ---------- */
-
-.lives-wrap { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-.lives-label { font: 700 10px var(--font-ui); letter-spacing: 2px; color: rgba(190, 240, 255, 0.75); }
-#lives-row { display: flex; gap: 7px; }
-#lives-row .life {
-    width: 9px;
-    height: 9px;
-    transform: rotate(45deg);
-    border: 1.5px solid rgba(41, 243, 255, 0.45);
-}
-#lives-row .life.on {
-    background: var(--neon);
-    border-color: var(--neon);
-    box-shadow: 0 0 8px var(--neon);
-}
-#lives-row.hit { animation: lives-hit 0.5s ease-out; }
-@keyframes lives-hit {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-5px); }
-    40% { transform: translateX(5px); }
-    60% { transform: translateX(-3px); }
-    80% { transform: translateX(3px); }
-}
-
-/* ---------- HUD: shield button ---------- */
-
-#shield-btn {
-    position: absolute;
-    top: calc(128px + var(--safe-t));
-    right: calc(126px + var(--safe-r));
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 50%;
-    pointer-events: auto;
-    touch-action: none;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    color: #9fd2ff;
-    border: 2px solid var(--shield);
-    background: radial-gradient(circle, rgba(74, 168, 255, 0.18) 0%, rgba(6, 18, 36, 0.8) 72%);
-    box-shadow: 0 0 16px rgba(74, 168, 255, 0.45), inset 0 0 14px rgba(74, 168, 255, 0.25);
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-#shield-btn:hover {
-    transform: scale(1.06);
-    box-shadow: 0 0 22px rgba(74, 168, 255, 0.7), inset 0 0 18px rgba(74, 168, 255, 0.35);
-}
-#shield-btn svg { width: 24px; height: 24px; filter: drop-shadow(0 0 5px rgba(74, 168, 255, 0.8)); }
-
-.shield-count {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 4px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    font: 800 11px/20px var(--font-hud);
-    text-align: center;
-    color: #03060d;
-    background: var(--shield);
-    box-shadow: 0 0 8px var(--shield);
-}
-
-.shield-label {
-    position: absolute;
-    top: -17px;
-    left: 50%;
-    transform: translateX(-50%);
-    font: 700 9px var(--font-hud);
-    letter-spacing: 2px;
-    color: rgba(159, 210, 255, 0.85);
-    text-shadow: 0 0 6px rgba(74, 168, 255, 0.8);
-}
-
-.ad-badge {
-    display: none;
-    position: absolute;
-    top: -4px;
-    right: -6px;
-    padding: 2px 5px;
-    border-radius: 4px;
-    font: 800 9px/1.2 var(--font-hud);
-    letter-spacing: 1px;
-    color: #1a1000;
-    background: linear-gradient(90deg, var(--reward-a), var(--reward-b));
-    box-shadow: 0 0 10px rgba(255, 190, 60, 0.6);
-}
-
-#shield-btn.empty { color: rgba(159, 210, 255, 0.5); border-color: rgba(74, 168, 255, 0.5); animation: shield-wants-ad 1.6s ease-in-out infinite; }
-#shield-btn.empty .shield-count { display: none; }
-#shield-btn.empty .ad-badge { display: block; }
-@keyframes shield-wants-ad {
-    0%, 100% { box-shadow: 0 0 10px rgba(74, 168, 255, 0.3); }
-    50%      { box-shadow: 0 0 22px rgba(255, 190, 60, 0.55); }
-}
-#shield-btn.ping { animation: shield-ping 0.4s ease-out; }
-@keyframes shield-ping { 50% { transform: scale(1.12); } }
-
-/* On touch screens the shield button sits next to the jump button */
-body.touch #shield-btn {
-    top: auto;
-    right: calc(166px + var(--safe-r));
-    bottom: calc(108px + var(--safe-b));
-    width: 58px;
-    height: 58px;
-}
-@media (orientation: landscape) and (max-height: 500px) {
-    body.touch #shield-btn {
-        top: auto;
-        right: calc(150px + var(--safe-r));
-        bottom: calc(96px + var(--safe-b));
-        width: 54px;
-        height: 54px;
-    }
-}
-@media (orientation: portrait) {
-    body.touch #shield-btn {
-        top: auto;
-        right: calc(46px + var(--safe-r));
-        bottom: calc(166px + var(--safe-b));
-        width: 54px;
-        height: 54px;
-    }
-}
-
-/* Fallback for narrow desktop screens */
-@media (max-width: 650px) {
-    #shield-btn {
-        top: auto;
-        bottom: calc(34px + var(--safe-b));
-        right: calc(24px + var(--safe-r));
-    }
-}
-
-/* ---------- Popup: no shields left ---------- */
-
-.feature-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 70;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(2, 6, 14, 0.62);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-}
-.feature-modal.show { display: flex; }
-
-.modal-card {
-    width: min(360px, 88vw);
-    padding: 18px 18px 14px;
-    text-align: center;
-    color: #dff1ff;
-    background: linear-gradient(180deg, rgba(14, 30, 50, 0.96), rgba(5, 12, 24, 0.96));
-    border: 1px solid rgba(74, 168, 255, 0.6);
-    border-radius: 10px;
-    box-shadow: 0 0 30px rgba(74, 168, 255, 0.25), inset 0 0 24px rgba(74, 168, 255, 0.08);
-}
-.modal-icon svg { width: 40px; height: 40px; color: var(--shield); filter: drop-shadow(0 0 8px rgba(74, 168, 255, 0.9)); }
-.modal-card h2 { margin: 6px 0 4px; font: 800 18px var(--font-hud); letter-spacing: 2px; color: #bfe0ff; text-shadow: 0 0 10px rgba(74, 168, 255, 0.6); }
-.modal-card p { margin: 0 0 14px; font-size: 13px; line-height: 1.45; color: rgba(220, 238, 255, 0.85); }
-.modal-card .btn { font-size: 15px; padding: 11px 16px; margin-bottom: 8px; }
-.modal-timer { height: 3px; margin-top: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
-#shield-offer-bar { height: 100%; width: 100%; background: var(--shield); box-shadow: 0 0 8px var(--shield); }
-
-/* ---------- AppLixir player overlay ---------- */
-
-.applixir-ad {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: #000;
-}
-.applixir-ad.show { display: flex; }
-
-/* ---------- Demo rewarded video ---------- */
-
-.demo-ad {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: none;
-    flex-direction: column;
-    background: #0b0b0f;
-    color: #eee;
-    font-family: var(--font-ui);
-}
-.demo-ad.show { display: flex; }
-
-.demo-ad-top {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: calc(12px + var(--safe-t)) calc(14px + var(--safe-r)) 12px calc(14px + var(--safe-l));
-}
-.demo-ad-count { margin-left: auto; font-size: 13px; color: #aaa; }
-.demo-ad-close {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid #555;
-    background: #1b1b22;
-    color: #ddd;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.demo-ad-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 0 24px 24px; text-align: center; }
-.demo-ad-art {
-    width: min(240px, 50vw);
-    aspect-ratio: 16 / 9;
-    border-radius: 8px;
-    background: linear-gradient(120deg, #2a1a5e, #0f4c75, #1b998b, #2a1a5e);
-    background-size: 300% 300%;
-    animation: demo-ad-art 3s linear infinite;
-}
-@keyframes demo-ad-art { to { background-position: 300% 0; } }
-.demo-ad-body h3 { margin: 4px 0 0; font-size: 15px; letter-spacing: 1px; }
-.demo-ad-body p { margin: 0; font-size: 12px; color: #9a9a9a; }
-.demo-ad-progress { width: min(320px, 70vw); height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
-#demo-ad-fill { height: 100%; width: 0; background: var(--reward-b); }
-.demo-ad.done #demo-ad-status { color: #7dff9e; }
 
 /* ---------- Short landscape phones: two-column start menu so it fits ---------- */
 
@@ -1356,13 +1002,12 @@ body.touch #shield-btn {
                 </ul>
             </div>
 
-            <!-- features/shield.js: shields you own + watch an ad for one more -->
+            <!-- features/shield.js: shields you own -->
             <div class="reward-strip">
                 <div class="reward-info">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.6 7.5 10 4.3-1.4 7.5-5.4 7.5-10v-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6.5 8 8.1v3.6c0 2.6 1.7 4.9 4 5.8 2.3-.9 4-3.2 4-5.8V8.1z" fill="currentColor" opacity=".35"/></svg>
                     <div><b>SHIELDS <span id="menu-shield-count">2</span></b><small>2 free every day</small></div>
                 </div>
-                <button id="menu-shield-ad" class="reward-btn"><span class="play">▶</span> AD · +1</button>
             </div>
         </div>
     </div>
@@ -1398,37 +1043,15 @@ body.touch #shield-btn {
     </div>
 </div>
 
-<!-- Out of lives (features/run.js) -->
+<!-- Out of lives -->
 <div id="gameover-menu" class="fullscreen-menu">
     <div class="menu-box glass-panel danger">
         <h1>SYSTEM FAILURE</h1>
         <p id="death-reason">Connection lost.</p>
         <p class="go-stats">NO LIVES LEFT · SECTOR <b id="go-sector">01</b> · DATA <b id="go-data">00/05</b></p>
-        <button id="continue-ad-btn" class="btn btn-reward"><span class="play">▶</span> WATCH AD · +1 LIFE &amp; CONTINUE</button>
-        <button id="skip-continue-btn" class="btn btn-secondary">SKIP</button>
+        <button id="retry-btn" class="btn">RETRY SECTOR</button>
+        <button id="restart-btn" class="btn btn-secondary">RESTART FROM SECTOR 1</button>
         <p class="go-total">ARCHIVED DATA: <b id="go-total" class="c-red">0</b></p>
-    </div>
-</div>
-
-<!-- Ad skipped → back to Sector 1, with a banner ad (features/run.js) -->
-<div id="restart-menu" class="fullscreen-menu">
-    <div class="menu-box glass-panel">
-        <h1>RUN RESET</h1>
-        <p class="restart-note">You skipped the ad, so this run starts again from <b class="c-cyan">Sector 1</b>.</p>
-        <div class="rules-list stats-list">
-            <p>REACHED: <b>SECTOR <span id="rs-sector">01</span></b></p>
-            <p>BEST: <b>SECTOR <span id="rs-best">01</span></b></p>
-            <p>TOTAL ARCHIVE: <b id="rs-total" class="highlight">0</b></p>
-        </div>
-        <button id="restart-btn" class="btn">RESTART FROM SECTOR 1</button>
-    </div>
-</div>
-
-<!-- Shared banner ad slot for menus (Run Reset, System Paused) -->
-<div id="banner-slot" class="ad-banner" aria-label="CrazyGames Advertisement">
-    <div class="cg-banner-placeholder">
-        <span class="cg-banner-badge">CRAZYGAMES</span>
-        <span class="cg-banner-txt">SPONSORED BANNER</span>
     </div>
 </div>
 
@@ -1448,11 +1071,9 @@ body.touch #shield-btn {
         <div class="lives-wrap"><span class="lives-label">LIVES</span><div id="lives-row"></div></div>
     </div>
 
-    <!-- features/shield.js: shield count; shows AD when empty -->
     <button id="shield-btn" aria-label="Shield">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.6 7.5 10 4.3-1.4 7.5-5.4 7.5-10v-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6.5 8 8.1v3.6c0 2.6 1.7 4.9 4 5.8 2.3-.9 4-3.2 4-5.8V8.1z" fill="currentColor" opacity=".35"/></svg>
         <span id="shield-count" class="shield-count">2</span>
-        <span class="ad-badge">AD</span>
         <span class="shield-label">SHIELD</span>
     </button>
 
@@ -1485,39 +1106,6 @@ body.touch #shield-btn {
     </button>
 </div>
 
-
-<!-- Shield offer when you crash with 0 shields (features/shield.js) -->
-<div id="shield-offer" class="feature-modal">
-    <div class="modal-card">
-        <div class="modal-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.6 7.5 10 4.3-1.4 7.5-5.4 7.5-10v-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6.5 8 8.1v3.6c0 2.6 1.7 4.9 4 5.8 2.3-.9 4-3.2 4-5.8V8.1z" fill="currentColor" opacity=".35"/></svg></div>
-        <h2>NO SHIELDS LEFT</h2>
-        <p>Watch a short ad to get a shield and keep your run going.</p>
-        <button id="shield-offer-watch" class="btn btn-reward"><span class="play">▶</span> WATCH AD · +1 SHIELD</button>
-        <button id="shield-offer-skip" class="btn btn-secondary">SKIP · LOSE 1 LIFE</button>
-        <div class="modal-timer"><div id="shield-offer-bar"></div></div>
-    </div>
-</div>
-
-<!-- "Loading ad…" / "Ad not available" message (features/ads/ads.js) -->
-<div id="ad-toast" class="ad-toast" role="status" aria-live="polite"></div>
-
-<!-- AppLixir video player goes in here (features/ads/ads-applixir.js) -->
-<div id="applixir-ad-container" class="applixir-ad"></div>
-
-<!-- Demo rewarded video (features/ads/ads-demo.js) -->
-<div id="demo-ad" class="demo-ad" role="dialog" aria-label="Advertisement">
-    <div class="demo-ad-top">
-        <span class="ad-tag">DEMO AD</span>
-        <span class="demo-ad-count"><span id="demo-ad-count">5</span>s</span>
-        <button id="demo-ad-close" class="demo-ad-close" aria-label="Close ad">✕</button>
-    </div>
-    <div class="demo-ad-body">
-        <div class="demo-ad-art"></div>
-        <h3>CrazyGames Rewarded Video Ad</h3>
-        <p id="demo-ad-status">Rewarded video</p>
-        <div class="demo-ad-progress"><div id="demo-ad-fill"></div></div>
-    </div>
-</div>
 
 <script>
 // --- THREE.JS ADDONS (Bloom & Composer) ---
@@ -3511,7 +3099,7 @@ function attachButtonAction(id, action) {
     btn.addEventListener('touchstart', (e) => { e.stopPropagation(); if (e.cancelable) e.preventDefault(); action(); }, {passive: false});
 }
 
-// Start / Next / Exit / Restart buttons are wired in features/run.js (run flow, lives, ads).
+// Start / Next / Exit / Restart buttons are wired in features/run.js (run flow, lives).
 
 
 // =========================================================
@@ -3521,19 +3109,16 @@ function attachButtonAction(id, action) {
 const FEATURES = {
     dailyFreeShields: 2,             // free shields every day (resets at local midnight)
     livesPerRun: 3,                  // lives at the start of a run (Start Run → game over)
-    respawnShieldSeconds: 2,         // can't be hit for this long after a respawn / continue
+    respawnShieldSeconds: 2,         // can't be hit for this long after a respawn
     shieldGraceSeconds: 1,           // can't be hit for this long after a shield blocks a hurdle
-    respawnDelayMs: 700,             // show the crash for this long before respawning
-    shieldOfferSeconds: 6,           // "watch ad for a shield" popup auto-skips after this
-    maxAdContinuesPerRun: Infinity,  // "watch ad, +1 life" per run (Infinity = no limit)
-    demoAdSeconds: 5                 // length of the demo rewarded video
+    respawnDelayMs: 700              // show the crash for this long before respawning
 };
 
 
 // =========================================================
 // Neon Core features — saved progress (localStorage)
 //
-//   shields     shields the player owns right now (free daily + earned from ads)
+//   shields     shields the player owns right now (free daily + earned in runs)
 //   shieldDay   the day the free shields were last topped up (YYYY-MM-DD)
 //   run         the run in progress: { sector, difficulty, lives } or null
 //   bestSector  highest sector ever reached
@@ -3580,7 +3165,7 @@ function todayKey() {
 // =========================================================
 // Neon Core features — time freeze
 //
-// Anything can freeze the game by name (an ad, a popup, a respawn, the app going to the
+// Anything can freeze the game by name (a popup, a respawn, the app going to the
 // background). The game runs again only when every reason is released. While frozen:
 // no physics, no collisions, and the sector timer does not count.
 // =========================================================
@@ -3617,156 +3202,21 @@ document.addEventListener('visibilitychange', () => {
 
 
 // =========================================================
-// Neon Core — ad IDs. This is the only file to edit when you go live.
-//
-// The game picks the ad network by where it runs:
-//   Android app (Capacitor)               → AdMob                  (ads-admob.js)
-//   Website on an AppLixir-registered host → AppLixir rewarded video (ads-applixir.js)
-//   Website with an AdSense ID             → AdSense H5 Games Ads   (ads-web.js)
-//   Nothing filled in / other hosts        → demo ads               (ads-demo.js)
+// Neon Core — CrazyGames SDK v3 Integration (Basic Launch Mode - Arcade Edition)
 // =========================================================
-
-const ADS_CONFIG = {
-    admob: {
-        // Ad unit IDs from your AdMob account. Google's official TEST IDs are filled in for now:
-        // they always serve test ads, so it's safe to tap them while developing.
-        // Before publishing: put your own IDs here and set testing to false.
-        rewardedId: 'ca-app-pub-3940256099942544/5224354917',
-        bannerId:   'ca-app-pub-3940256099942544/6300978111',
-        testing: true
-        // The AdMob APP ID (ca-app-pub-…~…) goes in
-        // android-app/android/app/src/main/res/values/strings.xml → admob_app_id
-    },
-
-    applixir: {
-        // API key from the AppLixir dashboard → Sites (one key per registered site).
-        apiKey: '',
-        // Hosts registered in AppLixir (the game lives at https://play.asaxenadev.com/game/).
-        // Anywhere else (GitHub Pages, localhost) the game keeps demo ads,
-        // because AppLixir only serves ads on registered domains.
-        allowedHosts: ['play.asaxenadev.com']
-    },
-
-    web: {
-        // Your AdSense publisher ID (ca-pub-…) once your site is approved for H5 Games Ads.
-        // Empty = the website keeps showing demo ads.
-        adsenseClient: '',
-        // Optional AdSense display ad unit (data-ad-slot) for the banner on the Run Reset screen.
-        bannerSlot: '',
-        // Adds data-adbreak-test="on" so AdSense serves test ads while you try it out.
-        testing: true
-    }
-};
-
-
-// =========================================================
-// Neon Core — DEMO ads (used until real ad IDs are filled in)
-// Same behaviour as real rewarded ads: close early = no reward.
-// =========================================================
-
-const DemoAds = {
-    finish: null,
-
-    init() {
-        attachButtonAction('demo-ad-close', () => { if (this.finish) this.finish(); });
-    },
-
-    prepareRewarded() {},
-
-    showRewarded(placement) {
-        return new Promise((resolve) => {
-            const el = document.getElementById('demo-ad');
-            const fill = document.getElementById('demo-ad-fill');
-            const count = document.getElementById('demo-ad-count');
-            const status = document.getElementById('demo-ad-status');
-            const total = FEATURES.demoAdSeconds;
-            let left = total, earned = false;
-
-            el.dataset.placement = placement;
-            status.textContent = 'Rewarded video · watch till the end to get the reward';
-            fill.style.width = '0%';
-            count.textContent = Math.ceil(left);
-            el.classList.remove('done');
-            el.classList.add('show');
-
-            const timer = setInterval(() => {
-                left = Math.max(left - 0.1, 0);
-                fill.style.width = `${(1 - left / total) * 100}%`;
-                count.textContent = Math.ceil(left);
-                if (left <= 0 && !earned) {
-                    earned = true;
-                    clearInterval(timer);
-                    status.textContent = 'Reward earned ✓';
-                    el.classList.add('done');
-                    setTimeout(finish, 700);
-                }
-            }, 100);
-
-            const finish = () => {
-                clearInterval(timer);
-                this.finish = null;
-                el.classList.remove('show', 'done');
-                resolve(earned ? 'viewed' : 'dismissed');
-            };
-            this.finish = finish;
-        });
-    },
-
-    showBanner(placement) {
-        const slot = document.getElementById('banner-slot');
-        slot.dataset.placement = placement;
-        slot.classList.add('show');
-    },
-
-    hideBanner() {
-        document.getElementById('banner-slot').classList.remove('show');
-    }
-};
-
-
-// --- CRAZYGAMES SDK ADAPTER ---
-
-// =========================================================
-// Neon Core — CrazyGames SDK v3 Integration
-// =========================================================
-const CrazyGamesAds = {
+const CrazyGamesSDK = {
     ready: false,
-    environment: 'disabled',
-    lastMidgameAdTime: 0,
-    midgameCooldownMs: 60000,
 
     async init() {
-        const waitForSdk = () => {
-            return new Promise((resolve) => {
-                if (window.CrazyGames && window.CrazyGames.SDK) return resolve(true);
-                let waited = 0;
-                const interval = setInterval(() => {
-                    waited += 100;
-                    if (window.CrazyGames && window.CrazyGames.SDK) {
-                        clearInterval(interval);
-                        resolve(true);
-                    } else if (waited >= 4000) {
-                        clearInterval(interval);
-                        resolve(false);
-                    }
-                }, 100);
-            });
-        };
-
-        const hasSdk = await waitForSdk();
-        if (!hasSdk) {
-            console.warn('[CrazyGames] SDK script not detected after waiting. Demo ads fallback active.');
-            return;
-        }
-
-        try {
-            await window.CrazyGames.SDK.init();
-            this.ready = true;
-            this.environment = window.CrazyGames.SDK.environment || 'crazygames';
-            console.log('[CrazyGames] SDK v3 initialized successfully. Environment:', this.environment);
-        } catch (err) {
-            console.warn('[CrazyGames] SDK init note (normal if outside portal):', err);
-            this.ready = false;
+        if (typeof window !== 'undefined' && window.CrazyGames && window.CrazyGames.SDK) {
+            try {
+                await window.CrazyGames.SDK.init();
+                this.ready = true;
+                console.log('[CrazyGames] SDK v3 initialized in Basic Launch mode (Game Analytics active).');
+            } catch (err) {
+                console.warn('[CrazyGames] SDK init note:', err);
+                this.ready = false;
+            }
         }
     },
 
@@ -3783,220 +3233,20 @@ const CrazyGamesAds = {
     happytime() {
         if (!this.ready || !window.CrazyGames?.SDK?.game) return;
         try { window.CrazyGames.SDK.game.happytime(); } catch (e) {}
-    },
-
-    prepareRewarded() {},
-
-    showRewarded(placement) {
-        return new Promise((resolve) => {
-            if (!this.ready || !window.CrazyGames?.SDK?.ad) {
-                console.log('[CrazyGames] Outside portal, simulating reward for:', placement);
-                if (typeof DemoAds !== 'undefined' && DemoAds.showRewarded) {
-                    DemoAds.showRewarded(placement).then(resolve);
-                } else {
-                    resolve('viewed');
-                }
-                return;
-            }
-
-            showAdLoading(true);
-            setGameAudio(false);
-            let rewarded = false;
-
-            window.CrazyGames.SDK.ad.requestAd('rewarded', {
-                adStarted: () => {
-                    showAdLoading(false);
-                    setGameAudio(false);
-                },
-                adFinished: () => {
-                    rewarded = true;
-                    showAdLoading(false);
-                    setGameAudio(true);
-                    resolve('viewed');
-                },
-                adError: (error) => {
-                    console.warn('[CrazyGames] Rewarded ad error:', error);
-                    showAdLoading(false);
-                    setGameAudio(true);
-                    if (!rewarded) resolve('unavailable');
-                }
-            });
-        });
-    },
-
-    showMidgame(reason) {
-        return new Promise((resolve) => {
-            const now = Date.now();
-            if (now - this.lastMidgameAdTime < this.midgameCooldownMs) {
-                resolve(false);
-                return;
-            }
-            if (!this.ready || !window.CrazyGames?.SDK?.ad) {
-                resolve(false);
-                return;
-            }
-            setGameAudio(false);
-            window.CrazyGames.SDK.ad.requestAd('midgame', {
-                adStarted: () => { setGameAudio(false); },
-                adFinished: () => {
-                    this.lastMidgameAdTime = Date.now();
-                    setGameAudio(true);
-                    resolve(true);
-                },
-                adError: (error) => {
-                    console.warn('[CrazyGames] Midgame ad error:', error);
-                    setGameAudio(true);
-                    resolve(false);
-                }
-            });
-        });
-    },
-
-    showBanner(placement) {
-        const slot = document.getElementById('banner-slot');
-        if (!slot) return;
-        slot.dataset.placement = placement;
-        slot.classList.add('show');
-        if (!this.ready || !window.CrazyGames?.SDK?.banner) return;
-        try {
-            const isMobile = window.innerWidth <= 768;
-            const w = isMobile ? 320 : 728;
-            const h = isMobile ? 50 : 90;
-            window.CrazyGames.SDK.banner.requestBanner({
-                id: 'banner-slot',
-                width: w,
-                height: h
-            });
-        } catch (e) {
-            console.warn('[CrazyGames] requestBanner note:', e);
-        }
-    },
-
-    hideBanner() {
-        const slot = document.getElementById('banner-slot');
-        if (slot) slot.classList.remove('show');
-        if (!this.ready || !window.CrazyGames?.SDK?.banner) return;
-        try { window.CrazyGames.SDK.banner.clearBanner('banner-slot'); } catch (e) {}
     }
 };
 
-
-// --- ADS ADAPTER ---
-
-const AD_NETWORKS = { crazygames: CrazyGamesAds, demo: DemoAds };
-
-function isNativeApp() { return false; }
-
-function pickAdNetwork() {
-    return 'crazygames';
-}
-
-const Ads = {
-    network: pickAdNetwork(),
-    busy: false,
-
-    prepareRewarded(placement) {
-        try { AD_NETWORKS[this.network].prepareRewarded(placement); } catch (e) {}
-    },
-
-    async showRewarded(placement) {
-        if (this.busy) return false;
-        this.busy = true;
-        setGameAudio(false);
-        let result = 'unavailable';
-        try {
-            result = await AD_NETWORKS[this.network].showRewarded(placement);
-        } catch (e) {
-            result = 'unavailable';
-        } finally {
-            showAdLoading(false);
-            setGameAudio(true);
-            this.busy = false;
-        }
-        if (result === 'unavailable') showAdToast('Ad not available right now — try again in a moment.');
-        return result === 'viewed';
-    },
-
-    showMidgame(reason) {
-        try {
-            if (AD_NETWORKS[this.network] && typeof AD_NETWORKS[this.network].showMidgame === 'function') {
-                return AD_NETWORKS[this.network].showMidgame(reason);
-            }
-        } catch (e) {}
-        return Promise.resolve(false);
-    },
-
-    gameplayStart() {
-        try {
-            if (AD_NETWORKS[this.network] && typeof AD_NETWORKS[this.network].gameplayStart === 'function') {
-                AD_NETWORKS[this.network].gameplayStart();
-            }
-        } catch (e) {}
-    },
-
-    gameplayStop() {
-        try {
-            if (AD_NETWORKS[this.network] && typeof AD_NETWORKS[this.network].gameplayStop === 'function') {
-                AD_NETWORKS[this.network].gameplayStop();
-            }
-        } catch (e) {}
-    },
-
-    happytime() {
-        try {
-            if (AD_NETWORKS[this.network] && typeof AD_NETWORKS[this.network].happytime === 'function') {
-                AD_NETWORKS[this.network].happytime();
-            }
-        } catch (e) {}
-    },
-
-    showBanner(placement) {
-        try { AD_NETWORKS[this.network].showBanner(placement); } catch (e) {}
-    },
-
-    hideBanner() {
-        try { AD_NETWORKS[this.network].hideBanner(); } catch (e) {}
-    }
-};
-
-function setGameAudio(on) {
-    if (!audioCtx || isMuted) return;
-    try { on ? audioCtx.resume() : audioCtx.suspend(); } catch (e) {}
-}
-
-let adToastTimer = null;
-function showAdToast(text, ms = 2400) {
-    const el = document.getElementById('ad-toast');
-    if (!el) return;
-    el.textContent = text;
-    el.classList.add('show');
-    clearTimeout(adToastTimer);
-    adToastTimer = setTimeout(() => el.classList.remove('show'), ms);
-}
-
-function showAdLoading(on) {
-    const el = document.getElementById('ad-toast');
-    if (!el) return;
-    clearTimeout(adToastTimer);
-    if (on) { el.textContent = 'Loading ad…'; el.classList.add('show'); }
-    else if (el.textContent === 'Loading ad…') el.classList.remove('show');
-}
-
-AD_NETWORKS[Ads.network].init();
-document.body.dataset.adNetwork = Ads.network;
+CrazyGamesSDK.init();
 
 
 // --- FEATURES (Shield, Lives, Run Flow) ---
 // =========================================================
 // Neon Core features — shield
 //
-// • 2 free shields every day (FEATURES.dailyFreeShields). Ad shields add on top.
+// • 2 free shields every day (FEATURES.dailyFreeShields).
 // • Hitting a red hurdle with a shield: the shield is used automatically, the hurdle breaks,
 //   the run goes on (short grace time so a cluster of hurdles can't chain-hit you).
-// • Hitting a hurdle with 0 shields: the game freezes and offers "watch ad → +1 shield".
-//   Skip (or let the timer run out) and you lose a life instead.
-// • HUD shield button: shows the count; at 0 it shows AD — tap any time to watch an ad
-//   for +1 shield (the game freezes while the ad plays).
+// • Hitting a hurdle with 0 shields: costs 1 life.
 // • Shields only protect from hurdles. Falling off the track always costs a life.
 // =========================================================
 
@@ -4023,7 +3273,6 @@ const Shield = {
         SaveData.data.shields--;
         SaveData.save();
         renderShieldUI();
-        if (SaveData.data.shields === 0) Ads.prepareRewarded('shield');   // HUD button now offers an ad
         return true;
     }
 };
@@ -4038,8 +3287,11 @@ function renderShieldUI() {
 // ---------- Hurdle hit (called from js/game.js) ----------
 
 function onHurdleHit(mine) {
-    if (Shield.use()) { absorbHit(mine); return; }
-    offerShield(mine);
+    if (Shield.use()) {
+        absorbHit(mine);
+        return;
+    }
+    loseLife('LASER COLLISION!', { mine: mine });
 }
 
 function absorbHit(mine) {
@@ -4050,86 +3302,11 @@ function absorbHit(mine) {
     playSynth(900, 'triangle', 0.15, 0.08); setTimeout(() => playSynth(450, 'triangle', 0.25, 0.06), 60);
 }
 
-// ---------- "No shields left" offer ----------
-
-let shieldOffer = null;
-
-function offerShield(mine) {
-    pauseGame('shield-offer');
-    Ads.prepareRewarded('shield');
-    shieldOffer = { mine: mine, left: FEATURES.shieldOfferSeconds, timer: null };
-    document.getElementById('shield-offer').classList.add('show');
-    startOfferCountdown();
-}
-
-function startOfferCountdown() {
-    const bar = document.getElementById('shield-offer-bar');
-    clearInterval(shieldOffer.timer);
-    shieldOffer.timer = setInterval(() => {
-        shieldOffer.left -= 0.1;
-        bar.style.width = `${Math.max(shieldOffer.left / FEATURES.shieldOfferSeconds, 0) * 100}%`;
-        if (shieldOffer.left <= 0) skipShieldOffer();
-    }, 100);
-}
-
-function closeShieldOffer() {
-    clearInterval(shieldOffer.timer);
-    document.getElementById('shield-offer').classList.remove('show');
-    const mine = shieldOffer.mine;
-    shieldOffer = null;
-    return mine;
-}
-
-async function watchShieldOfferAd() {
-    if (!shieldOffer || Ads.busy) return;
-    clearInterval(shieldOffer.timer);
-    document.getElementById('shield-offer').classList.remove('show');
-    const earned = await Ads.showRewarded('shield');
-    if (!shieldOffer) return;
-    if (earned) {
-        const mine = closeShieldOffer();
-        Shield.add(1);
-        Shield.use();
-        absorbHit(mine);
-        resumeGame('shield-offer');
-    } else {
-        // Ad closed early: back to the offer with a fresh timer
-        shieldOffer.left = FEATURES.shieldOfferSeconds;
-        document.getElementById('shield-offer').classList.add('show');
-        startOfferCountdown();
-    }
-}
-
-function skipShieldOffer() {
-    if (!shieldOffer) return;
-    const mine = closeShieldOffer();
-    loseLife('LASER COLLISION!', { mine: mine });   // freezes again for the respawn
-    resumeGame('shield-offer');
-}
-
-attachButtonAction('shield-offer-watch', watchShieldOfferAd);
-attachButtonAction('shield-offer-skip', skipShieldOffer);
-
-// ---------- HUD button and start-menu button: watch an ad any time for +1 ----------
-
-async function watchAdForShield(fromMenu) {
-    if (Ads.busy) return;
-    if (!fromMenu) {
-        if (!isPlaying || isGameOver || Pause.paused) return;
-        if (Shield.count > 0) {             // shields are automatic; just remind the player
-            const btn = document.getElementById('shield-btn');
-            btn.classList.remove('ping'); void btn.offsetWidth; btn.classList.add('ping');
-            return;
-        }
-        pauseGame('shield-ad');
-    }
-    const earned = await Ads.showRewarded('shield');
-    if (earned) { Shield.add(1); playPowerup(); }
-    if (!fromMenu) resumeGame('shield-ad');
-}
-
-attachButtonAction('shield-btn', () => watchAdForShield(false));
-attachButtonAction('menu-shield-ad', () => watchAdForShield(true));
+attachButtonAction('shield-btn', () => {
+    if (!isPlaying || isGameOver || Pause.paused) return;
+    const btn = document.getElementById('shield-btn');
+    btn.classList.remove('ping'); void btn.offsetWidth; btn.classList.add('ping');
+});
 
 // ---------- Shield bubble flash ----------
 
@@ -4168,7 +3345,7 @@ renderShieldUI();
 //   and can't be hit for a moment. With no lives left → out-of-lives screen (features/run.js).
 // =========================================================
 
-const Lives = { count: FEATURES.livesPerRun, adContinues: 0, lastWasFall: false };
+const Lives = { count: FEATURES.livesPerRun, lastWasFall: false };
 
 let invulnTime = 0;                               // seconds; counted down in js/game.js
 const lastSafe = { x: 0, z: -2, plat: null };     // updated in js/game.js when the ball lands on a platform
@@ -4238,26 +3415,21 @@ function flashLives() {
 // Neon Core features — run flow and saved progress
 //
 // • Start menu: "CONTINUE · SECTOR N" when a run is saved, plus "NEW RUN".
-//   Also shows your shields with a "watch ad → +1 shield" button.
 // • The run (sector, difficulty, lives) is saved at the start of every sector and after
 //   clearing one, so closing the app doesn't lose progress.
-// • Out of lives → "watch ad → +1 life, continue right here".
-//   Skip → "you skipped the ad, back to Sector 1" screen with a banner ad.
+// • Out of lives → System Failure screen with Retry Sector / Restart options.
 // =========================================================
 
 document.body.classList.toggle('touch', IS_TOUCH);
 
 function showOnly(id) {
-    ['start-menu', 'level-menu', 'gameover-menu', 'restart-menu', 'pause-modal'].forEach(m => {
+    ['start-menu', 'level-menu', 'gameover-menu', 'pause-modal'].forEach(m => {
         const el = document.getElementById(m);
         if (el) el.style.display = (m === id) ? 'flex' : 'none';
     });
     const pauseBtn = document.getElementById('pause-btn');
     if (pauseBtn) {
         pauseBtn.style.display = (id === null || id === 'pause-modal') ? 'grid' : 'none';
-    }
-    if (id !== 'restart-menu' && id !== 'pause-modal') {
-        Ads.hideBanner();
     }
 }
 
@@ -4276,20 +3448,19 @@ function refreshStartMenu() {
     document.getElementById('new-run-btn').style.display = r ? 'block' : 'none';
     document.getElementById('continue-info').textContent = r ? `${r.difficulty} · ${r.lives} ${r.lives === 1 ? 'LIFE' : 'LIVES'} LEFT` : '';
     renderShieldUI();
-    Ads.prepareRewarded('shield');          // for the "▶ AD · +1" button
 }
 
 // ---------- Starting sectors ----------
 
 function beginSector() {
-    Ads.gameplayStart();
+    CrazyGamesSDK.gameplayStart();
     enterFullscreen();
     initAudio();
     showOnly(null);
     document.getElementById('ui').style.display = 'block';
     if (IS_TOUCH) document.getElementById('mobile-controls').style.display = 'flex';
 
-    ['gameover', 'respawn', 'shield-offer', 'shield-ad'].forEach(r => Pause.reasons.delete(r));
+    ['gameover', 'respawn'].forEach(r => Pause.reasons.delete(r));
     Shield.refreshDaily();
     invulnTime = 0;
     generateLevel();
@@ -4300,7 +3471,6 @@ function beginSector() {
 
 function startNewRun() {
     level = 1;
-    Lives.adContinues = 0;
     setLives(FEATURES.livesPerRun);
     beginSector();
 }
@@ -4308,9 +3478,8 @@ function startNewRun() {
 function continueRun() {
     const r = savedRun();
     if (!r) { startNewRun(); return; }
-    setDifficulty(r.difficulty);   // resets level to 1, so set the sector after it
+    setDifficulty(r.difficulty);
     level = r.sector;
-    Lives.adContinues = 0;
     setLives(r.lives || FEATURES.livesPerRun);
     beginSector();
 }
@@ -4324,51 +3493,29 @@ function onSectorComplete() {
 // ---------- Out of lives ----------
 
 function outOfLives(reason) {
-    Ads.gameplayStop();
+    CrazyGamesSDK.gameplayStop();
     isGameOver = true;
     isPlaying = false;
     pauseGame('gameover');
-    Ads.prepareRewarded('continue');
     keys.w = keys.a = keys.s = keys.d = keys.space = false;
 
     document.getElementById('death-reason').innerText = reason;
     document.getElementById('go-sector').innerText = pad2(level);
     document.getElementById('go-data').innerText = `${pad2(ringsCollected)}/${pad2(targetRings)}`;
     document.getElementById('go-total').innerText = totalScore;
-    const canContinue = Lives.adContinues < FEATURES.maxAdContinuesPerRun;
-    document.getElementById('continue-ad-btn').style.display = canContinue ? 'block' : 'none';
-    document.getElementById('skip-continue-btn').textContent = canContinue ? 'SKIP' : 'CONTINUE';
 
     setTimeout(() => { if (isGameOver) showOnly('gameover-menu'); }, FEATURES.respawnDelayMs);
 }
 
-async function continueWithAd() {
-    if (Ads.busy) return;
-    const earned = await Ads.showRewarded('continue');
-    if (!earned) return;                         // closed early: stay on this screen
-    Lives.adContinues++;
-    setLives(1);
-    showOnly(null);
-    isGameOver = false;
-    isPlaying = true;
-    respawnBall(Lives.lastWasFall ? 'safe' : 'here');
-    SaveData.setRun({ sector: level, difficulty: selectedDifficulty, lives: Lives.count });
+function retrySector() {
     resumeGame('gameover');
-    Ads.gameplayStart();
-}
-
-function skipContinue() {
-    Ads.gameplayStop();
-    SaveData.clearRun();
-    document.getElementById('rs-sector').innerText = pad2(level);
-    document.getElementById('rs-best').innerText = pad2(SaveData.data.bestSector);
-    document.getElementById('rs-total').innerText = totalScore;
-    showOnly('restart-menu');
-    Ads.showBanner('restart');
+    isGameOver = false;
+    setLives(FEATURES.livesPerRun);
+    beginSector();
 }
 
 function restartFromSectorOne() {
-    Ads.hideBanner();
+    SaveData.clearRun();
     resumeGame('gameover');
     isGameOver = false;
     startNewRun();
@@ -4402,13 +3549,11 @@ function togglePauseMenu() {
     if (Pause.reasons.has('esc-pause')) {
         resumeGame('esc-pause');
         modal.style.display = 'none';
-        Ads.hideBanner();
-        Ads.gameplayStart();
+        CrazyGamesSDK.gameplayStart();
     } else {
         pauseGame('esc-pause');
         modal.style.display = 'flex';
-        Ads.showBanner('pause');
-        Ads.gameplayStop();
+        CrazyGamesSDK.gameplayStop();
     }
 }
 
@@ -4416,22 +3561,15 @@ attachButtonAction('pause-btn', togglePauseMenu);
 attachButtonAction('resume-btn', () => {
     const modal = document.getElementById('pause-modal');
     if (modal) modal.style.display = 'none';
-    Ads.hideBanner();
     resumeGame('esc-pause');
-    Ads.gameplayStart();
+    CrazyGamesSDK.gameplayStart();
 });
 
-attachButtonAction('pause-exit-btn', async () => {
+attachButtonAction('pause-exit-btn', () => {
     const modal = document.getElementById('pause-modal');
     if (modal) modal.style.display = 'none';
-    Ads.hideBanner();
     resumeGame('esc-pause');
-    Ads.gameplayStop();
-
-    // Show Demo Ad when exiting to menu
-    try {
-        await Ads.showRewarded('exit');
-    } catch (e) {}
+    CrazyGamesSDK.gameplayStop();
 
     if (document.fullscreenElement && document.exitFullscreen) {
         try { document.exitFullscreen().catch(() => {}); } catch(e) {}
@@ -4446,8 +3584,7 @@ attachButtonAction('pause-exit-btn', async () => {
     refreshStartMenu();
 });
 
-attachButtonAction('continue-ad-btn', continueWithAd);
-attachButtonAction('skip-continue-btn', skipContinue);
+attachButtonAction('retry-btn', retrySector);
 attachButtonAction('restart-btn', restartFromSectorOne);
 
 refreshStartMenu();
@@ -4595,7 +3732,8 @@ function stepPhysics(timeScale) {
 }
 
 function showLevelComplete() {
-    if (typeof Ads !== "undefined") { Ads.gameplayStop(); Ads.happytime(); }
+    CrazyGamesSDK.gameplayStop();
+    CrazyGamesSDK.happytime();
     isPlaying = false; playWin();
     keys.w = keys.a = keys.s = keys.d = keys.space = false;
 
