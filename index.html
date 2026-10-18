@@ -944,27 +944,78 @@ body.touch .touch-only { display: flex; }
     padding-bottom: 76px;   /* keep the buttons well above the banner */
 }
 
-/* Demo banner ad (320×50), pinned to the bottom, away from the buttons */
+/* CrazyGames sponsored banner slot (adaptive 728x90 desktop / 320x50 mobile) */
 .ad-banner {
     display: none;
     position: fixed;
     left: 50%;
-    bottom: calc(12px + var(--safe-b));
+    bottom: calc(14px + var(--safe-b, 0px));
     transform: translateX(-50%);
-    width: 320px;
-    height: 50px;
+    width: 728px;
+    max-width: calc(100vw - 32px);
+    height: 90px;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font: 600 11px var(--font-hud);
-    color: #555;
-    background: repeating-linear-gradient(45deg, #f2f2f2 0 10px, #e8e8e8 10px 20px);
-    border: 1px solid #ccc;
-    z-index: 55;
+    gap: 12px;
+    background: rgba(8, 14, 26, 0.94);
+    border: 1px solid rgba(41, 243, 255, 0.4);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.85), 0 0 12px rgba(41, 243, 255, 0.25);
+    border-radius: 6px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    z-index: 60;
 }
 .ad-banner.show { display: flex; }
-.ad-banner.live { background: none; border: none; }      /* real AdSense banner: no demo styling */
+.ad-banner.live { background: none; border: none; box-shadow: none; }
+
+.cg-banner-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: rgba(41, 243, 255, 0.9);
+    text-shadow: 0 0 8px rgba(41, 243, 255, 0.5);
+    background: radial-gradient(circle at center, rgba(104, 66, 255, 0.2), transparent 75%);
+}
+.cg-banner-badge {
+    background: #6842ff;
+    color: #ffffff;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    box-shadow: 0 0 12px rgba(104, 66, 255, 0.8);
+}
+.cg-banner-txt {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .ad-banner {
+        width: 320px;
+        height: 50px;
+        gap: 8px;
+    }
+    .cg-banner-placeholder {
+        font-size: 9px;
+        gap: 6px;
+    }
+    .cg-banner-badge {
+        font-size: 8px;
+        padding: 2px 6px;
+    }
+    .cg-banner-txt {
+        font-size: 9px;
+    }
+}
 
 /* "Loading ad…" / "Ad not available" */
 .ad-toast {
@@ -1374,8 +1425,11 @@ body.touch #shield-btn {
 </div>
 
 <!-- Shared banner ad slot for menus (Run Reset, System Paused) -->
-<div id="banner-slot" class="ad-banner" aria-label="Advertisement">
-    <span class="ad-tag">AD</span> CRAZYGAMES SPONSORED BANNER
+<div id="banner-slot" class="ad-banner" aria-label="CrazyGames Advertisement">
+    <div class="cg-banner-placeholder">
+        <span class="cg-banner-badge">CRAZYGAMES</span>
+        <span class="cg-banner-txt">SPONSORED BANNER</span>
+    </div>
 </div>
 
 <!-- In-game HUD -->
@@ -3801,12 +3855,17 @@ const CrazyGamesAds = {
         slot.classList.add('show');
         if (!this.ready || !window.CrazyGames?.SDK?.banner) return;
         try {
+            const isMobile = window.innerWidth <= 768;
+            const w = isMobile ? 320 : 728;
+            const h = isMobile ? 50 : 90;
             window.CrazyGames.SDK.banner.requestBanner({
                 id: 'banner-slot',
-                width: 300,
-                height: 250
+                width: w,
+                height: h
             });
-        } catch (e) {}
+        } catch (e) {
+            console.warn('[CrazyGames] requestBanner note:', e);
+        }
     },
 
     hideBanner() {
